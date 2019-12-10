@@ -225,7 +225,7 @@ int EnterKeyHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	GetWindowText(editControl->hWnd, TStr, 512);
 	ControlSetValue(STATIC_LAB_MULTICAST_IP_ID, 0, TStr, 0);
 	SetFocus(resultControl->hWnd);
-	Edit_SetSel(resultControl->hWnd, -2, -1);
+	Edit_Scroll(resultControl->hWnd, 200, 200);
 	SetFocus(editControl->hWnd);
 
 	return 0;
