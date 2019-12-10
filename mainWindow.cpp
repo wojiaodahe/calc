@@ -219,13 +219,14 @@ int EnterKeyHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	if (!resultControl)
 		return -1;
 
-#if 0
+#if 1
 	//EM_GETLINE(&HC4 = 196)//行号,ByVal 变量 获取编辑控件某一行的内容，变量须预先赋空格
 	//EM_GETLINECOUNT(&HBA = 186, 0, 0// 获取编辑控件的总行数
 	GetWindowText(editControl->hWnd, TStr, 512);
 	ControlSetValue(STATIC_LAB_MULTICAST_IP_ID, 0, TStr, 0);
-
-	SendMessage(resultControl->hWnd, message, wParam, lParam);
+	SetFocus(resultControl->hWnd);
+	Edit_SetSel(resultControl->hWnd, -2, -1);
+	SetFocus(editControl->hWnd);
 
 	return 0;
 #else
