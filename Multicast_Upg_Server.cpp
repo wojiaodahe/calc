@@ -14,7 +14,8 @@ extern void HandleCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 static HINSTANCE hInst;
 static TCHAR szClassName[] = TEXT("Win32Demo");  //窗口类名
-
+extern void ControlSetValue(int ctlId, int valueType, void* value, int len);
+MyControl_t* GetControlUseId(int ctlId);
 
 int WINAPI WinMain(
 	HINSTANCE hInstance,
@@ -26,6 +27,7 @@ int WINAPI WinMain(
 	HWND     hwnd;  //窗口句柄
 	MSG      msg;  //消息
 	WNDCLASS wndclass;  //窗口类
+	MyControl_t* control;
 
 	hInst = hInstance;
 
@@ -45,9 +47,13 @@ int WINAPI WinMain(
 	RegisterClass(&wndclass);
 
 	InitColtrols();
-
+	control = GetControlUseId(MAIN_ID);
 	/**********第③步：消息循环**********/
-	while (GetMessage(&msg, NULL, 0, 0)) {
+	while (GetMessage(&msg, NULL, 0, 0))
+	{
+		if (msg.message == WM_KEYDOWN && msg.wParam == 0x0d)
+			PostMessage(control->hWnd, WM_SELF_KEY_ENTER_DOWN, msg.wParam, msg.lParam);
+
 		TranslateMessage(&msg);  //翻译消息
 		DispatchMessage(&msg);  //分派消息
 	}
@@ -70,6 +76,7 @@ HWND CreateControl(MyControl_t *ctl)
 	return ctl->hWnd;
 }
 extern MyControl_t Controls[];
+
 void InitColtrols(void)
 {
 	int i;
@@ -92,11 +99,11 @@ void InitColtrols(void)
 
 //窗口过程
 LRESULT CALLBACK WndProc(
-	HWND hWnd,
-	UINT message,
-	WPARAM wParam,
-	LPARAM lParam
-) {
+	HWND hWnd, //窗口句柄
+	UINT message, //消息标识号
+	WPARAM wParam, //消息参数,当为键盘时,表示虚拟键码
+	LPARAM lParam) //消息参数
+{
 	int wmId, wmEvent;
 	PAINTSTRUCT ps;
 	HDC hdc;
@@ -125,14 +132,20 @@ LRESULT CALLBACK WndProc(
 		// TODO:  在此添加任意绘图代码...
 		EndPaint(hWnd, &ps);
 		break;
+
 	case WM_COMMAND:
 		HandleCommand(hWnd, message, wParam, lParam);
 		break;
+case WM_SELF_KEY_ENTER_DOWN:
+		HandleCommand(hWnd, message, wParam, lParam);
+		break;
+
 	case WM_DESTROY:
 		//请做好善后工作
 		DeleteObject(hFont);
 		PostQuitMessage(0);
 		break;
+
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
 	}

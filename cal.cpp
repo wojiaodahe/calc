@@ -97,7 +97,7 @@ double string2num(struct expr* e)
  * from = 12 to = 15 Ôò mask = 0xf000
  */
 
-unsigned long getmask(unsigned int from, unsigned int to)
+unsigned long getmask(unsigned long from, unsigned long to)
 {
 	if (to > from)
 		return (~(~(0) << (to - from + 1))) << from;

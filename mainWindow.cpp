@@ -10,22 +10,15 @@
 #include <WinUser.h>
 #include <Iphlpapi.h>
 
- 
 #include "mainWindow.h"
 
-void SetEnableAfterButtonPress(int btnType);
-extern int NetTest(void);
+extern int calc(char* str);
 extern int GetNetCardInfo(void (*CallBack)(void* obj, void* arg), void* obj);
 TCHAR* CharToTchar(TCHAR* dest, const char* src, int len);
 char* TcharToChar(char* dest, TCHAR* src, int len);
 MyControl_t* GetControlUseId(int ctlId);
-void GetNetcardSelection(TCHAR* netcartName);
-void GetIntervalSelection(TCHAR* interval);
-extern int NetSendFile(TCHAR* netcard, TCHAR* multicastIp, TCHAR* interval, TCHAR* file);
-void GetMulticastIp(TCHAR* ip);
-void MupgServerStop(void);
+void ControlSetValue(int ctlId, int valueType, void* value, int len);
 
-void ControlCleanListview(void);
 
 int HandlerSetEn(MyControl_t *ctl, int en)
 {
@@ -34,14 +27,15 @@ int HandlerSetEn(MyControl_t *ctl, int en)
 	return 0;
 }
 
-extern int calc(char* str);
+
 int  HandlerImageSelectButton(struct myControl* control, HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	MyControl_t* editControl;
+	MyControl_t* resultControl;
 	TCHAR TStr[512];
 	TCHAR tmp[512];
 	char str[1024];
-	int result;
+	int result = 0;
 	
 	editControl = GetControlUseId(EDIT_IMAGE_SELECT_ID);
 	if (!editControl)
@@ -53,9 +47,11 @@ int  HandlerImageSelectButton(struct myControl* control, HWND hWnd, UINT message
 
 	TcharToChar(str, TStr, 16);
 
-	result = calc(str);
-	wsprintf(tmp, TEXT("Button Press %d"), result);
-	MessageBox(control->hWnd, tmp, TEXT("信息提示"), MB_ICONINFORMATION);
+	//result = calc(str);
+
+	resultControl = GetControlUseId(STATIC_LAB_MULTICAST_IP_ID);
+	wsprintf(tmp, TEXT("%d"), result);
+	//ControlSetValue(STATIC_LAB_MULTICAST_IP_ID, 0, tmp, 0);
 
 	return 0;
 }
@@ -101,15 +97,19 @@ int HandlerEditSetValue(struct myControl* control, int type, void* arg, int len)
 
 MyControl_t Controls[] =
 {
-	{NULL, TEXT("Win32Demo"), TEXT("Multicase Upgrade"), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGH, NULL, (HMENU)MAIN_ID, 0, NULL, NULL},
+	{NULL, TEXT("Win32Demo"), TEXT("Calculator"), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGH, NULL, (HMENU)MAIN_ID, 0, NULL, NULL},
 
 	{
-		NULL, TEXT("static"), TEXT("Multicast IP"),
+		NULL, TEXT("edit"), TEXT(""),
 		STATIC_LAB_MULTICAST_IP_STYLE,
 		STATIC_LAB_MULTICAST_IP_X,
 		STATIC_LAB_MULTICAST_IP_Y,
 		STATIC_LAB_MULTICAST_IP_WIDTH,
-		STATIC_LAB_MUMTICAST_IP_HEIGH, NULL, (HMENU)STATIC_LAB_MULTICAST_IP_ID, 0, NULL, NULL
+		STATIC_LAB_MUMTICAST_IP_HEIGH, NULL, (HMENU)STATIC_LAB_MULTICAST_IP_ID, 0, NULL, 
+		NULL,
+		NULL,
+		HandlerEditSetValue,
+		NULL
 	},
 
 	{
@@ -124,9 +124,9 @@ MyControl_t Controls[] =
 		HandlerEditSetValue,
 		NULL
 	},
-
+#if 0
 	{
-		NULL, TEXT("button"), TEXT("Open"),
+		NULL, TEXT("button"), TEXT("C"),
 		BUTTON_IMAGE_SELECT_STYLE,
 		BUTTON_IMAGE_SELECT_X,
 		BUTTON_IMAGE_SELECT_Y,
@@ -137,6 +137,7 @@ MyControl_t Controls[] =
 		NULL,
 		HandlerSetEn
 	},
+#endif
 };
 
 int GetCountOfControls(void)
@@ -197,6 +198,62 @@ void ControlSetDisable(HMENU CtlId)
 	}
 }
 
+int EnterKeyHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	HWND focus;
+	TCHAR TStr[512];
+	TCHAR tmp[512];
+	char str[1024];
+	int result = 0;
+	int lineCount;
+	MyControl_t* editControl;
+	MyControl_t* resultControl;
+	   
+	focus = GetFocus();
+
+	editControl = GetControlUseId(EDIT_IMAGE_SELECT_ID);
+	if (!editControl)
+		return -1;
+
+	resultControl = GetControlUseId(STATIC_LAB_MULTICAST_IP_ID);
+	if (!resultControl)
+		return -1;
+
+#if 0
+	//EM_GETLINE(&HC4 = 196)//行号,ByVal 变量 获取编辑控件某一行的内容，变量须预先赋空格
+	//EM_GETLINECOUNT(&HBA = 186, 0, 0// 获取编辑控件的总行数
+	GetWindowText(editControl->hWnd, TStr, 512);
+	ControlSetValue(STATIC_LAB_MULTICAST_IP_ID, 0, TStr, 0);
+
+	SendMessage(resultControl->hWnd, message, wParam, lParam);
+
+	return 0;
+#else
+	lineCount = Edit_GetLineCount(editControl->hWnd);
+	Edit_GetLine(editControl->hWnd, lineCount - 1, (LPARAM)TStr, 512);
+
+	TcharToChar(str, TStr, 16);
+	result = calc(str);
+		
+	wsprintf(tmp, TEXT("%d\r\n"), result);
+	ControlSetValue(STATIC_LAB_MULTICAST_IP_ID, 0, tmp, 0);
+
+	return 0;
+#endif
+}
+
+void HandleSelfMsg(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	TCHAR tmp[512];
+
+	switch (message)
+	{
+	case WM_SELF_KEY_ENTER_DOWN:
+		EnterKeyHandler(hWnd, message, wParam, lParam);
+		break;
+	}
+}
+
 void HandleCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	int i;
@@ -206,12 +263,20 @@ void HandleCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	wmId = LOWORD(wParam);
 	wmEvent = HIWORD(wParam);
 	
-	for (i = 0; i < GetCountOfControls(); i++)
+	if (If_Self_Msg(message))
 	{
-		if (Controls[i].hMenu == (HMENU)wmId && Controls[i].MessagHeandler)
+		HandleSelfMsg(hWnd,  message, wParam, lParam);
+		return;
+	}
+	else
+	{
+		for (i = 0; i < GetCountOfControls(); i++)
 		{
-			Controls[i].MessagHeandler(&Controls[i], hWnd, message, wParam, lParam);
-			return;
+			if (Controls[i].hMenu == (HMENU)wmId && Controls[i].MessagHeandler)
+			{
+				Controls[i].MessagHeandler(&Controls[i], hWnd, message, wParam, lParam);
+				return;
+			}
 		}
 	}
 
