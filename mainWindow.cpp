@@ -12,10 +12,10 @@
 
 #include "mainWindow.h"
 
-extern int calc(char* str);
+extern int calc(char* str, char * result);
 extern int GetNetCardInfo(void (*CallBack)(void* obj, void* arg), void* obj);
-TCHAR* CharToTchar(TCHAR* dest, const char* src, int len);
-char* TcharToChar(char* dest, TCHAR* src, int len);
+TCHAR* CharToTchar(TCHAR* dest, const char* src, int strLen, int tcharLen);
+char* TcharToChar(char* dest, TCHAR* src, int len, int tcharLen);
 MyControl_t* GetControlUseId(int ctlId);
 void ControlSetValue(int ctlId, int valueType, void* value, int len);
 
@@ -30,34 +30,15 @@ int HandlerSetEn(MyControl_t *ctl, int en)
 
 int  HandlerImageSelectButton(struct myControl* control, HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	MyControl_t* editControl;
-	MyControl_t* resultControl;
-	TCHAR TStr[512];
-	TCHAR tmp[512];
-	char str[1024];
-	int result = 0;
-	
-	editControl = GetControlUseId(EDIT_IMAGE_SELECT_ID);
-	if (!editControl)
-		return -1;
 
-	GetWindowText(editControl->hWnd, TStr, 512);
-
-	
-
-	TcharToChar(str, TStr, 16);
-
-	//result = calc(str);
-
-	resultControl = GetControlUseId(STATIC_LAB_MULTICAST_IP_ID);
-	wsprintf(tmp, TEXT("%d"), result);
-	//ControlSetValue(STATIC_LAB_MULTICAST_IP_ID, 0, tmp, 0);
-
-	return 0;
 }
 
 int HandlerEditImageSelectPreInit(struct myControl* control)
 {
+	SendMessage(control->hWnd, EM_SETLIMITTEXT, (1024 * 1024 * 32), 0);
+
+	SetFocus(control->hWnd);
+
 	return 0;
 }
 
@@ -106,7 +87,7 @@ MyControl_t Controls[] =
 		STATIC_LAB_MULTICAST_IP_Y,
 		STATIC_LAB_MULTICAST_IP_WIDTH,
 		STATIC_LAB_MUMTICAST_IP_HEIGH, NULL, (HMENU)STATIC_LAB_MULTICAST_IP_ID, 0, NULL, 
-		NULL,
+		HandlerEditImageSelectPreInit,
 		NULL,
 		HandlerEditSetValue,
 		NULL
@@ -198,17 +179,22 @@ void ControlSetDisable(HMENU CtlId)
 	}
 }
 
+#define MAX_STRING_LEN	(1024 * 8)
+
+static char  resultStr[MAX_STRING_LEN];
+static char  expStr[MAX_STRING_LEN];
+static TCHAR expTchar[MAX_STRING_LEN];
+static char History[MAX_STRING_LEN];
+
 int EnterKeyHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	HWND focus;
-	TCHAR TStr[512];
-	TCHAR tmp[512];
-	char str[1024];
-	int result = 0;
-	int lineCount;
+
+	static int result = 0;
+	static int lineCount;
 	MyControl_t* editControl;
 	MyControl_t* resultControl;
-	   
+
 	focus = GetFocus();
 
 	editControl = GetControlUseId(EDIT_IMAGE_SELECT_ID);
@@ -219,28 +205,21 @@ int EnterKeyHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	if (!resultControl)
 		return -1;
 
-#if 1
-	//EM_GETLINE(&HC4 = 196)//行号,ByVal 变量 获取编辑控件某一行的内容，变量须预先赋空格
-	//EM_GETLINECOUNT(&HBA = 186, 0, 0// 获取编辑控件的总行数
-	GetWindowText(editControl->hWnd, TStr, 512);
-	ControlSetValue(STATIC_LAB_MULTICAST_IP_ID, 0, TStr, 0);
-	SetFocus(resultControl->hWnd);
-	Edit_Scroll(resultControl->hWnd, 200, 200);
-	SetFocus(editControl->hWnd);
-
-	return 0;
-#else
 	lineCount = Edit_GetLineCount(editControl->hWnd);
-	Edit_GetLine(editControl->hWnd, lineCount - 1, (LPARAM)TStr, 512);
+	Edit_GetLine(editControl->hWnd, lineCount - 1, (LPARAM)expTchar, 512);
 
-	TcharToChar(str, TStr, 16);
-	result = calc(str);
-		
-	wsprintf(tmp, TEXT("%d\r\n"), result);
-	ControlSetValue(STATIC_LAB_MULTICAST_IP_ID, 0, tmp, 0);
+	memset(resultStr, 0, sizeof (resultStr));
+	TcharToChar(expStr, expTchar, MAX_STRING_LEN, MAX_STRING_LEN);
+
+	result = calc(expStr, resultStr);
+	memset(expTchar, 0, sizeof (expTchar));
+	strcat(History, resultStr);
+	CharToTchar(expTchar, History, strlen(History), MAX_STRING_LEN);
+
+	ControlSetValue(STATIC_LAB_MULTICAST_IP_ID, 0, expTchar, 0);
+	Edit_Scroll(resultControl->hWnd, 2000, 0);
 
 	return 0;
-#endif
 }
 
 void HandleSelfMsg(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)

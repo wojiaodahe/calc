@@ -126,9 +126,16 @@ static double calE(struct expr* e) //计算一个数字、函数、或者小括号的值
 		}
 		fun[i] = '\0';
 		//判断函数名,在此不做错误检查
-		i = 0;
-		while (strcmp(lib[i], fun) != 0)
-			i++;
+		
+		for (i = 0; i < sizeof(lib) / sizeof(lib[0]); i++)
+		{
+			if (strcmp(lib[i], fun) == 0)
+				break;
+		}
+
+		if (i >= sizeof(lib) / sizeof(lib[0]))
+			return 0;
+
 		//执行函数计算
 		e->cc++;//跳过函数名之后的左括号
 		switch (i)
@@ -261,23 +268,33 @@ static double calA(struct expr* e)//计算完整表达式的值
 	return a;
 }
 
-void print_bit(unsigned long num)
+char *print_bit(unsigned long num)
 {
+	static char str[512];
+	char* tmp;
 	int i;
 	unsigned long bit = 0x01;
 
-	for (i = 63; i >= 0; i--) /* 从第一个为1的位开始打印 */
+	memset(str, 0, sizeof (str));
+	tmp = str;
+
+	for (i = 31; i >= 0; i--) /* 从第一个为1的位开始打印 */
 	{
 		if (num & (bit << i))
 			break;
 	}
+//		sprintf(str, "%d", num);
+//		return str; 
 
 	for (; i >= 0; i--)
 	{
-		printf("%d", (num & (bit << i)) ? 1 : 0);
+		//printf("%d", (num & (bit << i)) ? 1 : 0);
+		*tmp++ = (num & (bit << i)) ? '1' : '0';
 		if (!(i % 4))
-			printf(" ");
+			*tmp++ = ' ';
 	}
+
+	return str;
 }
 
 void help(void)
@@ -288,7 +305,7 @@ void help(void)
 	printf("sin(x)+con(y)*z^g  z^y means z to the yth power\n");
 }
 
-int calc(char *str)
+int calc(char *str, char *result_str)
 {
 	double result;
 	struct expr e;
@@ -298,12 +315,7 @@ int calc(char *str)
 
 	result = calA(&e);
 
-	printf("flt: %lf\n", result);
-	printf("dec: %ld\n", (long)result);
-	printf("hex: %lx\n", (unsigned long)result);
-	printf("bin: ");
-	print_bit((unsigned long)result);
-	printf("\n");
-
+	sprintf(result_str, "flt: %lf\r\ndec: %ld\r\nhex: %lx\r\nbin: %s\r\n\r\n", result, (unsigned long)result, (unsigned long)result, print_bit((long)result));
+	
 	return result;
 }
