@@ -13,8 +13,87 @@ struct expr
 	char* cc;
 };
 
+struct function
+{
+	int id;
+	const char* name;
+	double (*fun)(struct expr *e);
+	const char* (*help)(void);
+};
+
+
+enum funId
+{
+	FUNCTION_ID_SIN = 0,
+	FUNCTION_ID_COS,
+	FUNCTION_ID_TAN,
+	FUNCTION_ID_LG,
+	FUNCTION_ID_LN,
+	FUNCTION_ID_LOG	,
+
+	FUNCTION_ID_GETMASK,
+	FUNCTION_ID_GMASK,
+	FUNCTION_ID_GMSK,
+	FUNCTION_ID_GM,
+
+
+};
+
 const static char* lib[] = { "sin", "cos", "tan", "lg", "ln", "log", "getmask" }; //支持的函数列表
 static double calA(struct expr* e); //计算完整表达式的值，在此声明一下，以用于前向调用，到最后再实现它
+double getmask(struct expr* e);
+const char* getmaskHelp(void);
+double funSin(struct expr* e);
+double funCos(struct expr* e);
+double funTan(struct expr* e);
+double funLg(struct expr* e);
+double funLn(struct expr* e);
+double funLog(struct expr* e);
+
+struct function FUNCTION[] =
+{
+	{FUNCTION_ID_SIN,		"sin",		funSin},
+	{FUNCTION_ID_COS,		"cos",		funCos},
+	{FUNCTION_ID_TAN,		"tan",		funTan},
+	{FUNCTION_ID_LG,		"lg",		funLg},
+	{FUNCTION_ID_LN,		"ln",		funLn},
+	{FUNCTION_ID_LOG,		"log",		funLog},
+
+	{FUNCTION_ID_GETMASK,	"getmask",	getmask, getmaskHelp},
+	{FUNCTION_ID_GMASK,		"gmask",	getmask, getmaskHelp},
+	{FUNCTION_ID_GMSK,		"gmsk",		getmask, getmaskHelp},
+	{FUNCTION_ID_GM,		"gm",		getmask, getmaskHelp},
+};
+
+ double handleFunction(struct expr* e)
+ {
+	 int i, id;
+	 char fun[64];
+
+	 for (i = 0; *e->cc >= 'a' && *e->cc <= 'z'; e->cc++)
+	 {
+		 fun[i] = *e->cc;
+		 i++;
+
+		 if (i >= sizeof(fun))
+		 {
+			 //set error status and return
+			 return 0;
+		 }
+	 }
+	 fun[i] = '\0';
+
+	 if (*e->cc == '(')
+		e->cc++; //跳过函数名之后的左括号
+
+	 for (id = 0; id < sizeof(FUNCTION) / sizeof(FUNCTION[0]); id++)
+	 {
+		 if (strcmp(fun, FUNCTION[id].name) == 0)
+			 return FUNCTION[id].fun(e);
+	 }
+
+	 return 0;
+ }
 
 double string2dec(char** p)
 {
@@ -97,7 +176,14 @@ double string2num(struct expr* e)
  * from = 12 to = 15 则 mask = 0xf000
  */
 
-unsigned long getmask(unsigned long from, unsigned long to)
+const char* getmaskHelp(void)
+{
+	static const char* __getmaskHelp__ = "usage: gm(to,from) or gmsk(to,from) or getmask(to,from)\r\nget the mask from bit 'from' to bit 'to\r\nfor example:\r\nif from == 0 to == 7 then we will get the mask from 0 to 7 bits: 0xff";
+
+	return __getmaskHelp__;
+}
+
+double _getmask(unsigned long from, unsigned long to)
 {
 	if (to > from)
 		return (~(~(0) << (to - from + 1))) << from;
@@ -105,12 +191,55 @@ unsigned long getmask(unsigned long from, unsigned long to)
 		return (~(~(0) << (from - to + 1))) << to;
 }
 
+double getmask(struct expr* e)
+{
+	double a, b;
+
+	a = calA(e);
+	b = calA(e);
+	return _getmask((unsigned int)a, (unsigned int)b);
+}
+
+double funSin(struct expr* e)
+{
+	return sin(calA(e));
+}
+
+double funCos(struct expr* e)
+{
+	return cos(calA(e));
+}
+double funTan(struct expr* e)
+{
+	return tan(calA(e));
+}
+
+double funLg(struct expr* e)
+{
+	return log10(calA(e));
+}
+
+double funLn(struct expr* e)
+{
+	return log(calA(e));
+}
+
+double funLog(struct expr* e)
+{
+	double a, b;
+	
+	a = calA(e);
+	b = calA(e);
+
+    return log(b) / log(a);
+}
+
 static double calE(struct expr* e) //计算一个数字、函数、或者小括号的值
 {
 	int i;
 	double a, b;
 	char fun[16];
-
+#if 0
 	if (*e->cc == '(') //在此处理括号
 	{
 		e->cc++; //跳过左括号
@@ -157,8 +286,7 @@ static double calE(struct expr* e) //计算一个数字、函数、或者小括号的值
 		case 6:
 			a = calA(e);
 			b = calA(e);
-			return getmask((unsigned int)a, (unsigned int)b);
-			break;
+			return _getmask((unsigned int)a, (unsigned int)b);
 		}
 	}
 	else //普通实数
@@ -166,6 +294,21 @@ static double calE(struct expr* e) //计算一个数字、函数、或者小括号的值
 		a = string2num(e);
 		return a;
 	}
+
+#else
+	if (*e->cc == '(') //在此处理括号
+	{
+		e->cc++; //跳过左括号
+		return calA(e); //括号之内是完整的表达式结构
+	}
+	else if (*e->cc >= 'a' && *e->cc <= 'z') //出现一个字母，表示这应该是一个函数，做函数处理
+		return handleFunction(e);
+	else //普通实数
+	{
+		a = string2num(e);
+		return a;
+	}
+#endif
 }
 
 static double calD(struct expr* e)
@@ -297,12 +440,26 @@ char *print_bit(unsigned long num)
 	return str;
 }
 
-void help(void)
+const char *help(struct expr *e, char *result_str)
 {
+	int id;
+
 	printf("use it like this:\n");
 	printf("!x*(x<<x)+x&x|0xff+~(a|b)\n");
 	printf("getmask(x1,x1) get the mask from 'x1' to 'x2'\n");
 	printf("sin(x)+con(y)*z^g  z^y means z to the yth power\n");
+
+	e->cc += 4;
+	if (*e->cc == ' ')
+		e->cc += 1;
+
+	for (id = 0; id < sizeof(FUNCTION) / sizeof(FUNCTION[0]); id++)
+	{
+		if (strcmp(e->cc, FUNCTION[id].name) == 0)
+			return FUNCTION[id].help();
+	}
+
+	return "Unknow Function\r\n";
 }
 
 int calc(char *str, char *result_str)
@@ -312,9 +469,18 @@ int calc(char *str, char *result_str)
 
 	strcpy(e.str, str);
 	e.cc = e.str;
+	
+	if (*e.cc >= 'a' && *e.cc <= 'z')
+	{
+		if (strncmp(e.cc, "help", 4) == 0)
+		{
+			sprintf(result_str, "%s\r\n\r\n", help(&e, result_str));
+			return 0;
+		}
+	}
+
 
 	result = calA(&e);
-
 	sprintf(result_str, "flt: %lf\r\ndec: %ld\r\nhex: %lx\r\nbin: %s\r\n\r\n", result, (unsigned long)result, (unsigned long)result, print_bit((long)result));
 	
 	return result;

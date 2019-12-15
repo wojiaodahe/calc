@@ -205,10 +205,12 @@ int EnterKeyHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	if (!resultControl)
 		return -1;
 
+	memset(resultStr, 0, sizeof(resultStr));
+	memset(expTchar, 0, sizeof (expTchar));
+
 	lineCount = Edit_GetLineCount(editControl->hWnd);
 	Edit_GetLine(editControl->hWnd, lineCount - 1, (LPARAM)expTchar, 512);
 
-	memset(resultStr, 0, sizeof (resultStr));
 	TcharToChar(expStr, expTchar, MAX_STRING_LEN, MAX_STRING_LEN);
 
 	result = calc(expStr, resultStr);

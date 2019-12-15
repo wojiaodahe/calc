@@ -158,7 +158,9 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="cal.cpp" />
+    <ClCompile Include="cal.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
+    </ClCompile>
     <ClCompile Include="io.cpp" />
     <ClCompile Include="lib.cpp" />
     <ClCompile Include="mainWindow.cpp" />
