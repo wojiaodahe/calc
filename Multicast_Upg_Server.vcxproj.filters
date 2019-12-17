@@ -30,6 +30,18 @@
     <ClInclude Include="mainWindow.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="getmask.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="calc.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="__math.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="help.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Multicast_Upg_Server.cpp">
@@ -45,6 +57,15 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="cal.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="getmask.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="__math.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="help.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

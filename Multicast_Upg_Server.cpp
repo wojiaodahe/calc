@@ -77,6 +77,8 @@ HWND CreateControl(MyControl_t *ctl)
 }
 extern MyControl_t Controls[];
 
+extern void initGetMaskNode(void);
+extern void initHelpNode(void);
 void InitColtrols(void)
 {
 	int i;
@@ -95,6 +97,9 @@ void InitColtrols(void)
 		//更新（绘制）窗口
 		UpdateWindow(Controls[i].hWnd);
 	}
+
+	initGetMaskNode();
+	initHelpNode();
 }
 
 //窗口过程
