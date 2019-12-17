@@ -115,7 +115,7 @@ double handleFunction(struct expr* e)
 		e->cc++; //跳过函数名之后的左括号
 
 	if (*e->cc == ' ')
-		e->cc++; //跳过函数名之后的左括号
+		e->cc++; //跳过函数名之后的空格
 
 	fNode = findFunctionByName(fun);
 	if (fNode && fNode->fun)
@@ -271,10 +271,37 @@ char *print_bit(unsigned long num)
 	return str;
 }
 
+
+void stripBlank(char* str)
+{
+	char* tmp0;
+	char* tmp1;
+
+	tmp0 = str;
+	tmp1 = str;
+
+	while (*tmp1)
+	{
+		while (*tmp1 && *tmp1 != ' ')
+			*tmp0++ = *tmp1++;
+
+		while (*tmp1 == ' ')
+			tmp1++;
+
+		/* 空格两端都是字母，则表达可能是类似 help getmask 这样，所以两个字符串之间要留一个空格*/
+		if (*(tmp0 - 1) >= 'a' && *(tmp0 - 1) <= 'z' && *tmp1 >= 'a' && *tmp1 <= 'z')
+			tmp0++;
+	}
+
+	*tmp0 = 0;
+}
+
 int calc(char *str, char *result_str)
 {
 	double result;
 	struct expr e;
+
+	stripBlank(str);
 
 	strcpy(e.str, str);
 	e.cc = e.str;
