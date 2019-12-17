@@ -107,19 +107,33 @@ MyControl_t Controls[] =
 	},
 #if 0
 	{
-		NULL, TEXT("button"), TEXT("C"),
-		BUTTON_IMAGE_SELECT_STYLE,
-		BUTTON_IMAGE_SELECT_X,
-		BUTTON_IMAGE_SELECT_Y,
-		BUTTON_IMAGE_SELECT_WIDTH,
-		BUTTON_IMAGE_SELECT_HEIGH, NULL, (HMENU)BUTTON_IMAGE_SELECT_ID, 0, NULL,
-		NULL, 
-		HandlerImageSelectButton,
+		NULL, TEXT("static"), TEXT(""),
+		STATIC_DEBUG_WINDOW_STYLE,
+		STATIC_DEBUG_WINDOW_X,
+		STATIC_DEBUG_WINDOW_Y,
+		STATIC_DEBUG_WINDOW_WIDTH,
+		STATIC_DEBUG_WINDOW_HEIGH, NULL, (HMENU)STATIC_DEBUG_WINDOW_ID, 0, NULL,
+		HandlerEditImageSelectPreInit,
 		NULL,
-		HandlerSetEn
+		HandlerEditSetValue,
+		NULL
 	},
 #endif
 };
+
+void debugPrint(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+	MyControl_t* control;
+	TCHAR buff[128];
+
+	wsprintf(buff, TEXT("msg: %lx wParam: %lx lParam: %lx"), message, wParam, lParam);
+
+	control = GetControlUseId(STATIC_DEBUG_WINDOW_ID);
+	if (!control)
+		return;
+
+	SetWindowText(control->hWnd, buff);
+}
 
 int GetCountOfControls(void)
 {

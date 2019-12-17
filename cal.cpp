@@ -271,7 +271,6 @@ char *print_bit(unsigned long num)
 	return str;
 }
 
-
 void stripBlank(char* str)
 {
 	char* tmp0;

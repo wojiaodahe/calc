@@ -11,7 +11,7 @@ LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
 void InitColtrols(void);
 extern int GetCountOfControls(void);
 extern void HandleCommand(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-
+extern void debugPrint(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 static HINSTANCE hInst;
 static TCHAR szClassName[] = TEXT("Win32Demo");  //窗口类名
 extern void ControlSetValue(int ctlId, int valueType, void* value, int len);
@@ -51,8 +51,23 @@ int WINAPI WinMain(
 	/**********第③步：消息循环**********/
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		if (msg.message == WM_KEYDOWN && msg.wParam == 0x0d)
-			PostMessage(control->hWnd, WM_SELF_KEY_ENTER_DOWN, msg.wParam, msg.lParam);
+		if (msg.message == WM_KEYDOWN)
+		{
+			switch (msg.wParam)
+			{
+			case 0x0d: //回车
+				PostMessage(control->hWnd, WM_SELF_KEY_ENTER_DOWN, msg.wParam, msg.lParam);
+				break;
+
+			case 0x26: //up
+				continue;
+				break;
+
+			case 0x28: //down
+				continue;
+				break;
+			}
+		}
 
 		TranslateMessage(&msg);  //翻译消息
 		DispatchMessage(&msg);  //分派消息
