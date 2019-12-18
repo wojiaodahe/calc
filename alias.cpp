@@ -48,6 +48,8 @@ double alias(struct expr* e)
 	dest->fun = source->fun;
 	dest->flag = source->flag;
 	dest->help = source->help;
+	dest->next = NULL;
+	dest->prev = NULL;
 
 	strcpy(dest->name, name);
 	if (registerFunctionNode(dest) < 0)

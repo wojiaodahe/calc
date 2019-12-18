@@ -156,6 +156,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="getmask.h" />
     <ClInclude Include="help.h" />
+    <ClInclude Include="history.h" />
     <ClInclude Include="mainWindow.h" />
     <ClInclude Include="Multicast_Upg_Server.h" />
     <ClInclude Include="Resource.h" />
@@ -173,6 +174,7 @@
     <ClCompile Include="help.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
     </ClCompile>
+    <ClCompile Include="history.cpp" />
     <ClCompile Include="io.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
     </ClCompile>

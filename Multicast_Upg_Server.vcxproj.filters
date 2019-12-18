@@ -45,6 +45,9 @@
     <ClInclude Include="alias.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="history.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Multicast_Upg_Server.cpp">
@@ -72,6 +75,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="alias.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="history.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
