@@ -1,0 +1,69 @@
+#include "alias.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <string.h>
+#include <malloc.h>
+#include "calc.h"
+
+const char* aliasHelp(void)
+{
+	static const char* __getmaskHelp__ = "usage: alias source_name dest_nmae. for example: alias getmask gm";
+
+	return __getmaskHelp__;
+}
+
+double alias(struct expr* e)
+{
+	struct function* source;
+	struct function* dest;
+	char name[MAX_FUNCTION_NAME_SIZE] = { 0 };
+
+	if (!getFunctionName(e, name))
+	{
+		sprintf(e->resultStr, "%s: Source Name Can't To Be NULL", __func__);
+		return -1;
+	}
+	source = findFunctionByName(name);
+	if (!source)
+	{
+		sprintf(e->resultStr, "No function named %s", e->cc);
+		return -1;
+	}
+
+	dest = allocFunctionNode();
+	if (!dest)
+	{
+		sprintf(e->resultStr, "%s Out Of Memmory", __func__);
+		return -1;
+	}
+	
+	memset(name, 0, sizeof (name));
+	if (!getFunctionName(e, name))
+	{
+		sprintf(e->resultStr, "%s: Dest Name Can't To Be NULL", __func__);
+		return -1;
+	}
+
+	memcpy(dest, source, sizeof (struct function));
+	strcpy(dest->name, name);
+	if (registerFunctionNode(dest) < 0)
+	{
+		freeFunctionNode(dest);
+		sprintf(e->resultStr, "%s: register Failed", __func__);
+		return -1;
+	}
+
+	sprintf(e->resultStr, "%s: Success", __func__);
+	return 0;
+}
+
+static struct function AliasFunctionNode =
+{
+	0, "alias", alias, aliasHelp, FUNCTION_TYPE_1, NULL, NULL
+};
+
+void initAliasNode(void)
+{
+	registerFunctionNode(&AliasFunctionNode);
+}

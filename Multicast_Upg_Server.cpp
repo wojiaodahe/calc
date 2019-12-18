@@ -94,6 +94,7 @@ extern MyControl_t Controls[];
 
 extern void initGetMaskNode(void);
 extern void initHelpNode(void);
+extern void initAliasNode(void);
 void InitColtrols(void)
 {
 	int i;
@@ -115,6 +116,7 @@ void InitColtrols(void)
 
 	initGetMaskNode();
 	initHelpNode();
+	initAliasNode();
 }
 
 //窗口过程

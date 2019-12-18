@@ -92,30 +92,53 @@ void unregisterFunctionNode(struct function* node)
 	__removeFunction(&funHead, node);
 }
 
-double handleFunction(struct expr* e)
+/* 之后会改为使用functionNode池 */
+struct function* allocFunctionNode(void)
 {
-	int i, id;
-	char fun[64];
-	struct function* fNode;
+	struct function* node = (struct function*)malloc(sizeof (struct function));
+	return node;
+}
+
+void freeFunctionNode(struct function *node)
+{
+	
+}
+
+
+int getFunctionName(struct expr* e, char* name)
+{
+	int i;
 
 	for (i = 0; *e->cc >= 'a' && *e->cc <= 'z'; e->cc++)
 	{
-		fun[i] = *e->cc;
+		name[i] = *e->cc;
 		i++;
 
-	if (i >= sizeof(fun))
-	{
-		//set error status and return
-		return 0;
+		if (i >= MAX_FUNCTION_NAME_SIZE)
+		{
+			//set error status and return
+			return 0;
+		}
 	}
-	}
-	fun[i] = '\0';
+	name[i] = '\0';
 
 	if (*e->cc == '(')
 		e->cc++; //跳过函数名之后的左括号
 
 	if (*e->cc == ' ')
 		e->cc++; //跳过函数名之后的空格
+
+	return i;
+}
+
+double handleFunction(struct expr* e)
+{
+	int i, id;
+	char fun[MAX_FUNCTION_NAME_SIZE];
+	struct function* fNode;
+
+	if (!getFunctionName(e, fun))
+		return 0;
 
 	fNode = findFunctionByName(fun);
 	if (fNode && fNode->fun)

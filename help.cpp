@@ -13,7 +13,7 @@ const char* help()
 
 double Help(struct expr* e)
 {
-	int id;
+	int id; 
 	struct function* fNode;
 
 	printf("use it like this:\n");

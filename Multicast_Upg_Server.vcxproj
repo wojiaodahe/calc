@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="alias.h" />
     <ClInclude Include="calc.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="getmask.h" />
@@ -162,6 +163,7 @@
     <ClInclude Include="__math.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="alias.cpp" />
     <ClCompile Include="cal.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
     </ClCompile>
