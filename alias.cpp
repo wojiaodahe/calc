@@ -45,7 +45,10 @@ double alias(struct expr* e)
 		return -1;
 	}
 
-	memcpy(dest, source, sizeof (struct function));
+	dest->fun = source->fun;
+	dest->flag = source->flag;
+	dest->help = source->help;
+
 	strcpy(dest->name, name);
 	if (registerFunctionNode(dest) < 0)
 	{
