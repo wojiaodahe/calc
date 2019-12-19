@@ -175,7 +175,15 @@ static double calE(struct expr* e) //计算一个数字、函数、或者小括号的值
 	else if (*e->cc == '$')
 	{
 		e->cc++;
-		a = string2num(e);
+		if (*e->cc == '@') //$@表示最近一次计算结果
+		{
+			return getDollarAt();
+		}
+		else if (*e->cc < '0' || *e->cc > '9') //$后面可以跟表达式
+			a = calA(e);
+		else
+			a = string2num(e); //$0 $1 $2 $10086...
+		
 		return getDollarX(a);
 	}
 	else //普通实数

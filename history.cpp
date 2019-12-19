@@ -84,7 +84,8 @@ int __addHistoryNode(struct expr** head, struct expr* node)
 
 	*curr = node;
 	node->prev = entry;
-	current = node;
+	hisHead->prev = node;
+	current = NULL;
 
 	return 0;
 }
@@ -103,24 +104,28 @@ char* getHistoryPrev(void)
 {
 	struct expr* tmp;
 	
-	if (!current)
+	if (!hisHead || current == hisHead)
 		return NULL;
 	
-	if (!current->prev)
+	if (!current)
+	{
+		current = hisHead->prev;
 		return current->str;
-
-	tmp = current;
-	current = current->prev;
+	}
 	
-	return tmp->str;
+	current = current->prev;
+	return current->str;
 }
 
 char* getHistoryNext(void)
 {
-	if (!current || !current->next)
+	if (!current)
 		return NULL;
 	
 	current = current->next;
+	
+	if (!current)
+		return NULL;
 
 	return current->str;
 }
@@ -147,4 +152,21 @@ double getDollarX(unsigned int seq)
 	}
 
 	return entry->result;
+}
+
+double getDollarAt(void)
+{
+	struct expr* entry;
+	
+	if (!hisHead)
+		return NULL;
+
+	entry = hisHead->prev;
+	do
+	{
+		if (entry->flag & EXPRESSION_TYPE_MATH)
+			return entry->result;
+	} while (entry != hisHead);
+
+	return 0;
 }

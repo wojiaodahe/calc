@@ -11,6 +11,7 @@ struct history
 };
 
 extern double getDollarX(unsigned int seq);
+extern double getDollarAt(void);
 extern int addHistoryNode(struct expr* node);
 extern void removeHistoryNode(struct expr* node);
 extern char* getHistoryPrev(void);
