@@ -21,27 +21,27 @@ double alias(struct expr* e)
 
 	if (!getFunctionName(e, name))
 	{
-		sprintf(e->resultStr, "%s: Source Name Can't To Be NULL", __func__);
+		sprintf(e->resultStr, "%s: Source Name Can't To Be NULL\r\n\r\n", __func__);
 		return -1;
 	}
 	source = findFunctionByName(name);
 	if (!source)
 	{
-		sprintf(e->resultStr, "No function named %s", e->cc);
+		sprintf(e->resultStr, "No function named %s\r\n\r\n", e->cc);
 		return -1;
 	}
 
 	dest = allocFunctionNode();
 	if (!dest)
 	{
-		sprintf(e->resultStr, "%s Out Of Memmory", __func__);
+		sprintf(e->resultStr, "%s Out Of Memmory\r\n\r\n", __func__);
 		return -1;
 	}
 	
 	memset(name, 0, sizeof (name));
 	if (!getFunctionName(e, name))
 	{
-		sprintf(e->resultStr, "%s: Dest Name Can't To Be NULL", __func__);
+		sprintf(e->resultStr, "%s: Dest Name Can't To Be NULL\r\n\r\n", __func__);
 		return -1;
 	}
 
@@ -55,11 +55,11 @@ double alias(struct expr* e)
 	if (registerFunctionNode(dest) < 0)
 	{
 		freeFunctionNode(dest);
-		sprintf(e->resultStr, "%s: register Failed", __func__);
+		sprintf(e->resultStr, "%s: register Failed\r\n\r\n", __func__);
 		return -1;
 	}
 
-	sprintf(e->resultStr, "%s: Success", __func__);
+	sprintf(e->resultStr, "%s: %s to %s Success\r\n\r\n", __func__, source->name, dest->name);
 	return 0;
 }
 

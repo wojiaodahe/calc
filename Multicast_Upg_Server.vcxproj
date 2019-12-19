@@ -164,7 +164,9 @@
     <ClInclude Include="__math.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="alias.cpp" />
+    <ClCompile Include="alias.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
+    </ClCompile>
     <ClCompile Include="cal.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
     </ClCompile>
@@ -174,7 +176,9 @@
     <ClCompile Include="help.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
     </ClCompile>
-    <ClCompile Include="history.cpp" />
+    <ClCompile Include="history.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
+    </ClCompile>
     <ClCompile Include="io.cpp">
       <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Disabled</Optimization>
     </ClCompile>

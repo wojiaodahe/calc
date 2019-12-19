@@ -51,7 +51,7 @@ int WINAPI WinMain(
 	/**********第③步：消息循环**********/
 	while (GetMessage(&msg, NULL, 0, 0))
 	{
-		if (msg.message == WM_KEYDOWN)
+			if (msg.message == WM_KEYDOWN)
 		{
 			switch (msg.wParam)
 			{
@@ -60,10 +60,12 @@ int WINAPI WinMain(
 				break;
 
 			case 0x26: //up
+				PostMessage(control->hWnd, WM_SELF_KEY_UP_PRESS, msg.wParam, msg.lParam);
 				continue;
 				break;
 
 			case 0x28: //down
+				PostMessage(control->hWnd, WM_SELF_KEY_DOWN_PRESS, msg.wParam, msg.lParam);
 				continue;
 				break;
 			}
@@ -158,7 +160,9 @@ LRESULT CALLBACK WndProc(
 	case WM_COMMAND:
 		HandleCommand(hWnd, message, wParam, lParam);
 		break;
-case WM_SELF_KEY_ENTER_DOWN:
+	case WM_SELF_KEY_ENTER_DOWN:
+	case WM_SELF_KEY_UP_PRESS:
+	case WM_SELF_KEY_DOWN_PRESS:
 		HandleCommand(hWnd, message, wParam, lParam);
 		break;
 

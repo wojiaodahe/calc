@@ -7,6 +7,7 @@
 #include "calc.h"
 #include "getmask.h"
 #include "__math.h"
+#include "history.h"
 
 static int calStatus = 0; /* 计算结果通过return返回,中间出错状态存入calStatus里 */
 static struct function* funHead;
@@ -104,6 +105,19 @@ void freeFunctionNode(struct function *node)
 	
 }
 
+struct expr* allocExpressionNode(unsigned expressionLen)
+{
+	struct expr* node = (struct expr*)malloc(sizeof(struct expr) + expressionLen);
+
+	memset(node, 0, sizeof(struct expr) + expressionLen);
+
+	return node;
+}
+
+void freeExpressionNode(struct expr* node)
+{
+	free(node);
+}
 
 int getFunctionName(struct expr* e, char* name)
 {
@@ -158,6 +172,12 @@ static double calE(struct expr* e) //计算一个数字、函数、或者小括号的值
 	}
 	else if (*e->cc >= 'a' && *e->cc <= 'z') //出现一个字母，表示这应该是一个函数，做函数处理
 		return handleFunction(e);
+	else if (*e->cc == '$')
+	{
+		e->cc++;
+		a = string2num(e);
+		return getDollarX(a);
+	}
 	else //普通实数
 	{
 		a = string2num(e);
@@ -320,19 +340,30 @@ void stripBlank(char* str)
 
 int calc(char *str, char *result_str)
 {
+	static unsigned seq = 0;
 	double result;
-	struct expr e;
+	struct expr *e;
 
 	stripBlank(str);
 
-	strcpy(e.str, str);
-	e.cc = e.str;
-	e.resultStr = result_str;
-	*e.resultStr = 0;
+	e = allocExpressionNode(strlen(str));;
 
-	result = calA(&e);
-	if (!strlen(e.resultStr))
-		sprintf(result_str, "flt: %lf\r\ndec: %ld\r\nhex: %lx\r\nbin: %s\r\n\r\n", result, (unsigned long)result, (unsigned long)result, print_bit((long)result));
-	
+	strcpy(e->str, str);
+	e->strLen = strlen(str);
+	e->cc = e->str;
+	e->resultStr = result_str;
+	*e->resultStr = 0;
+
+	result = calA(e);
+	if (strlen(e->resultStr))
+		e->flag = FUNCTION_TYPE_1;
+	else
+	{
+		e->result = result;
+		e->flag = FUNCTION_TYPE_0;
+		sprintf(result_str, "$%d flt: %lf dec: %ld hex: %lx\r\n     bin: %s\r\n\r\n", seq, result, (unsigned long)result, (unsigned long)result, print_bit((long)result));
+		seq++;
+	}
+	addHistoryNode(e);
 	return result;
 }
