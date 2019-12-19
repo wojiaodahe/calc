@@ -24,7 +24,6 @@ int WINAPI WinMain(
 	int iCmdShow
 )
 {
-	HWND     hwnd;  //窗口句柄
 	MSG      msg;  //消息
 	WNDCLASS wndclass;  //窗口类
 	MyControl_t* control;
@@ -128,7 +127,6 @@ LRESULT CALLBACK WndProc(
 	WPARAM wParam, //消息参数,当为键盘时,表示虚拟键码
 	LPARAM lParam) //消息参数
 {
-	int wmId, wmEvent;
 	PAINTSTRUCT ps;
 	HDC hdc;
 	static HFONT hFont;

@@ -102,8 +102,6 @@ void removeHistoryNode(struct expr* node)
 
 char* getHistoryPrev(void)
 {
-	struct expr* tmp;
-	
 	if (!hisHead || current == hisHead)
 		return NULL;
 	

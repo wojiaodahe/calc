@@ -83,7 +83,7 @@ MyControl_t Controls[] =
 	{NULL, TEXT("Win32Demo"), TEXT("Calculator"), WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, MAIN_WINDOW_WIDTH, MAIN_WINDOW_HEIGH, NULL, (HMENU)MAIN_ID, 0, NULL, NULL},
 
 	{
-		NULL, TEXT("edit"), TEXT(""),
+		NULL, TEXT("edit"), TEXT("输入help获取help"),
 		STATIC_LAB_MULTICAST_IP_STYLE,
 		STATIC_LAB_MULTICAST_IP_X,
 		STATIC_LAB_MULTICAST_IP_Y,
@@ -195,8 +195,6 @@ void ControlSetDisable(HMENU CtlId)
 	}
 }
 
-
-
 void SetLastLineText(LPCWSTR str)
 {
 	unsigned int lineIndex;
@@ -286,7 +284,6 @@ void recoverLastLine(void)
 
 void upKeyHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	int lineCount;
 	char* str;
 	static TCHAR Tchar[MAX_STRING_LEN];
 
@@ -371,8 +368,6 @@ int EnterKeyHandler(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 }
 void HandleSelfMsg(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	TCHAR tmp[512];
-
 	switch (message)
 	{
 	case WM_SELF_KEY_ENTER_DOWN:

@@ -105,11 +105,12 @@ void freeFunctionNode(struct function *node)
 	
 }
 
-struct expr* allocExpressionNode(unsigned expressionLen)
+struct expr* allocExpressionNode(unsigned int expressionLen)
 {
 	struct expr* node = (struct expr*)malloc(sizeof(struct expr) + expressionLen);
-
-	memset(node, 0, sizeof(struct expr) + expressionLen);
+	
+	if (node)
+		memset(node, 0, sizeof(struct expr) + expressionLen);
 
 	return node;
 }
@@ -147,7 +148,6 @@ int getFunctionName(struct expr* e, char* name)
 
 double handleFunction(struct expr* e)
 {
-	int i, id;
 	char fun[MAX_FUNCTION_NAME_SIZE];
 	struct function* fNode;
 
@@ -161,9 +161,7 @@ double handleFunction(struct expr* e)
 
 static double calE(struct expr* e) //计算一个数字、函数、或者小括号的值
 {
-	int i;
-	double a, b;
-	char fun[16];
+	double a;
 
 	if (*e->cc == '(') //在此处理括号
 	{
@@ -184,7 +182,7 @@ static double calE(struct expr* e) //计算一个数字、函数、或者小括号的值
 		else
 			a = string2num(e); //$0 $1 $2 $10086...
 		
-		return getDollarX(a);
+		return getDollarX((unsigned int)a);
 	}
 	else //普通实数
 	{
